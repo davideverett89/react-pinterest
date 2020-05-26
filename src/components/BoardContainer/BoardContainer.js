@@ -7,6 +7,7 @@ import authData from '../../helpers/data/authData';
 import smash from '../../helpers/data/smash';
 
 import Board from '../Board/Board';
+import BoardForm from '../BoardForm/BoardForm';
 
 class BoardContainer extends React.Component {
   static propTypes = {
@@ -15,6 +16,7 @@ class BoardContainer extends React.Component {
 
   state ={
     boards: [],
+    formOpen: false,
   }
 
   getInfo = () => {
@@ -33,8 +35,17 @@ class BoardContainer extends React.Component {
       .catch((err) => console.error('There was a problem with deleting a board:', err));
   }
 
+  saveNewBoard = (newBoard) => {
+    boardsData.saveBoard(newBoard)
+      .then(() => {
+        this.getInfo();
+        this.setState({ formOpen: false });
+      })
+      .catch((err) => console.error('There is a problem with saving a new board:', err));
+  }
+
   render() {
-    const { boards } = this.state;
+    const { boards, formOpen } = this.state;
     const { setSingleBoard } = this.props;
     const makeBoards = boards.map((board) => (
       <Board key={board.id} board={board} setSingleBoard={setSingleBoard} removeBoard={this.removeBoard} />
@@ -43,6 +54,8 @@ class BoardContainer extends React.Component {
     return (
           <div className="BoardContainer">
               <h2>Boards</h2>
+              <button className="m-3 btn btn-success" onClick={() => this.setState({ formOpen: true })}><i className="fas fa-plus"></i></button>
+              { formOpen ? <BoardForm saveNewBoard={this.saveNewBoard} /> : ''}
               <div className="d-flex flex-wrap">
                 {makeBoards}
               </div>
